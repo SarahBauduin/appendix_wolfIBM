@@ -79,7 +79,7 @@ mortalityDispSD <- 0 # sd mortality for dispersers
 # Pack dissolvement
 nAlpha1Dissolve <- 0.258 # dissolvement probability for pack with 1 breeder
 nAlpha0Dissolve <- 0.846 # dissolvement probability for pack with 0 breeder
-thresholdPackSize <- 4.055 # pack size threshold for dissolvement
+thresholdPackSize <- 4.1 # pack size threshold for dissolvement
 
 # Replacement and establishment
 thresholdRelatedness <- 0.125 # relatedness threshold

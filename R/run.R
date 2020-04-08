@@ -24,7 +24,7 @@ source("initParam.R") # the data about the initial population and the sub-model 
 
 # Define the model parameter
 nReplicate <- 200 # how many replicates of the population simulation
-nYearSim <- 50 # how many years of simulation
+nYearSim <- 25 # how many years of simulation
 
 # Create the output files
 popSimRep <- list() # record as the list the state of the population each year for each simulation
