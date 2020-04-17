@@ -1,11 +1,10 @@
 ########################
-# Wolf IBM, January 2020
+# Wolf IBM, April 2020
 # Model authors (in alphabetical order): Sarah Bauduin, Oksana Grente, Nina Luisa Santostasi
 #
-# From the submitted paper: From individual behavior and pack dynamics to population responses: An individual-based approach to model the wolf social life cycle
+# From the submitted paper: Exploring lesser-known pack dynamics mechanisms with an individual-based approach to model the wolf life cycle
 # Paper authors: Sarah Bauduin, Oksana Grente, Nina Luisa Santostasi, Paolo Ciucci, Christophe Duchamp, and Olivier Gimenez
 # Submitted to Ecological Modelling
-# File part of the Appendix B
 ########################
 
 

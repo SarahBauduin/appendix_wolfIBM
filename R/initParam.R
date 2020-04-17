@@ -1,11 +1,10 @@
 ########################
-# Wolf IBM, January 2020
+# Wolf IBM, April 2020
 # Model authors (in alphabetical order): Sarah Bauduin, Oksana Grente, Nina Luisa Santostasi
 #
-# From the submitted paper: From individual behavior and pack dynamics to population responses: An individual-based approach to model the wolf social life cycle
+# From the submitted paper: Exploring lesser-known pack dynamics mechanisms with an individual-based approach to model the wolf life cycle
 # Paper authors: Sarah Bauduin, Oksana Grente, Nina Luisa Santostasi, Paolo Ciucci, Christophe Duchamp, and Olivier Gimenez
 # Submitted to Ecological Modelling
-# File part of the Appendix B
 ########################
 
 
@@ -79,11 +78,11 @@ mortalityDispSD <- 0 # sd mortality for dispersers
 # Pack dissolvement
 nAlpha1Dissolve <- 0.258 # dissolvement probability for pack with 1 breeder
 nAlpha0Dissolve <- 0.846 # dissolvement probability for pack with 0 breeder
-thresholdPackSize <- 4.1 # pack size threshold for dissolvement
+thresholdPackSize <- 4.1 # pack size threshold for dissolvement, values tested: 3.1, 4.1, 5.1
 
 # Replacement and establishment
 thresholdRelatedness <- 0.125 # relatedness threshold
-probBudd <- 0.5 # probability of budding
+probBudd <- 0.5 # probability of budding, values tested: 0.1, 0.5, 0.9
 
 # Dispersal
 meanPackSize <- 4.405 # mean pack size
@@ -97,8 +96,8 @@ nImmigrants <- c(0, 1, 2) # number of immigrants entering the study area
 pEmigr <- 0.1 # proportion of disperser emigrating outside of the study area
 
 # Adoption
-probAdopt <- 0.5
+probAdopt <- 0.5 # probability of adoption, values tested: 0.1, 0.5, 0.9
 
 # Running tests during the simulation to identify potential bugs
-runTests <- TRUE
+runTests <- TRUE # put FALSE for faster simulations
 ##################
