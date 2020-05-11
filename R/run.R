@@ -202,16 +202,12 @@ load("wolfSimRes.RData")
 #######################################
 # Result trend over the simulated years
 resSim_pack2breeders <- list() # number of packs with 2 breeding individuals, length(resSim_pack2breeders) == nYearSim
-resSim_numInd <- list() # number of indivduals, length(resSim_pack2breeders) == nYearSim
 for(i in 1:(nYearSim + 1)){ # nYearSim + 1 because the population was recorded before the beginning of the simulation and the population was recorded at the end of each year simulated
   j <- 1
   # Number of packs that have 2 breeding individuals in them for this year simulated for this simulation replicate
   resSim_pack2breeders[[i]] <- length(which(table(of(agents = NLwith(agents = popSimRep[[j]][[i]], var = "alpha", val = 1), var = "packID")) == 2)) 
-  # Number of individuals for this year simulated for this simulation replicate
-  resSim_numInd[[i]] <- NLcount(popSimRep[[j]][[i]]) 
   for(j in 2:nReplicate){
     resSim_pack2breeders[[i]] <- c(resSim_pack2breeders[[i]], length(which(table(of(agents = NLwith(agents = popSimRep[[j]][[i]], var = "alpha", val = 1), var = "packID")) == 2)))
-    resSim_numInd[[i]] <- c(resSim_numInd[[i]], NLcount(popSimRep[[j]][[i]]))
   }
 }
 
@@ -222,21 +218,18 @@ plot(0:nYearSim, unlist(lapply(resSim_pack2breeders, mean)), type = "l",
 lines(0:nYearSim, unlist(lapply(resSim_pack2breeders, quantile, probs = 0.025)), lty = 2) # dashed line
 lines(0:nYearSim, unlist(lapply(resSim_pack2breeders, quantile, probs = 0.975)), lty = 2) # dashed line
 
-# Plot the mean number of individuals in the population and the 95% confidence interval around the mean
-plot(0:nYearSim, unlist(lapply(resSim_numInd, mean)), type = "l",
-     xlab = "Years simulated", ylab = "Number of individuals",
-     ylim = c(min(unlist(resSim_numInd)), max(unlist(resSim_numInd))))
-lines(0:nYearSim, unlist(lapply(resSim_numInd, quantile, probs = 0.025)), lty = 2) # dashed line
-lines(0:nYearSim, unlist(lapply(resSim_numInd, quantile, probs = 0.975)), lty = 2) # dashed line
 #######################################
 
 #########################################
 # Results for the last year of simulation
+resSim_nInd <- numeric() # number of individuals
 resSim_newPacks <- numeric() # number of new packs created
 resSim_propRes <- numeric() # proportion of resident individuals
 resSim_relatBreeders <- numeric() # relatedness between breeders in packs
 
 for(j in 1:nReplicate){
+  # Total number of individuals for the last year of simulation for this simulation replicate
+  resSim_nInd <- c(resSim_nInd, NLcount(popSimRep[[j]][[(nYearSim + 1)]]))
   # Sum of new packs created by dispersing individuals pairing, by budding and by dispersers alone for the last year of simulation for this simulation replicate
   resSim_newPacks <- c(resSim_newPacks, sum(packDyn[packDyn$repSim == j & packDyn$yearSim == nYearSim, c("newPackPair", "newPackBud",  "newPackBud")]))
   # Number of resident individuals (i.e., not dispersers) over the total number of individual for the last year of simulation for this simulation replicate
@@ -261,6 +254,7 @@ for(j in 1:nReplicate){
 }
 
 # Plot a summary of the results for the last year of simation over all simulation replicates using boxplot
+boxplot(resSim_nInd, main = "Number of individuals in the population")
 boxplot(resSim_newPacks, main = "Number of new packs formed in the year")
 boxplot(resSim_propRes, main = "Proportion of resident individuals in the population")
 boxplot(resSim_relatBreeders, main = "Relatedness between the breeders in the packs")
