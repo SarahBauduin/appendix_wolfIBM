@@ -185,7 +185,7 @@ mortality <- function(wolves){
   # Calculate the current population density before any mortality event
   # The density does not include the pups of the year (Cubaynes et al. 2014)
   withoutPups  <- NLwith(agents = wolves, var = "age", val = 2:16)
-  popDens <- NLcount(withoutPups) / (CarryingCapacity * terrSize)
+  popDens <- NLcount(withoutPups) / (equilibriumDens * terrSize)
   # Number of packs in the population
   numPacks <- unique(of(agents = wolves, var = "packID"))
   numPacks <- numPacks[!is.na(numPacks)]
@@ -226,7 +226,7 @@ mortality <- function(wolves){
   wolvesAdult <- NLwith(agents = wolves, var = "age", val = 3:15)
   nonDispAdult <- NLwith(agents = wolvesAdult, var = "disp", val = 0)
   IDnonDispAdult <- of(agents = nonDispAdult, var = "who")
-  if(length(numPacks) == CarryingCapacity){ # at carrying capacity, mortality density dependent
+  if(length(numPacks) == equilibriumDens){ # at equilibrium density, mortality density dependent
     deadAdult <- rbinom(n = length(IDnonDispAdult), size = 1,
                         prob = rnorm(1, mean = mortalityDD(popDens = popDens), sd = 0))
   } else { # there are less packs than the maximum allowed for this study area, mortality not density dependent
@@ -671,8 +671,8 @@ establishPairing <- function(wolves, allPackID, allWolvesRelatedness){
   wolvesPackIDStart <- wolvesPackID 
   totalEstabypairing <- 0
   
-  # If the environment is not at carrying capacity, some new packs can be created
-  if(CarryingCapacity > length(wolvesPackID)){
+  # If the environment is not at equilibrium density, some new packs can be created
+  if(equilibriumDens > length(wolvesPackID)){
 
     Disperser <- NLwith(agents = wolves, var = "disp", val = 1)
     MatureDisp <- NLwith(agents = Disperser, var = "age", val = c(2:15))
@@ -684,13 +684,13 @@ establishPairing <- function(wolves, allPackID, allWolvesRelatedness){
     IDMaleWhoEst <- of(agents = MalesWhoEst, var = "who")
     
     # Number of possible new packs
-    NumPossPacks <- CarryingCapacity - length(wolvesPackID)
+    NumPossPacks <- equilibriumDens - length(wolvesPackID)
     
     # Form the pairs from the female point of view (female or male does not matter as two dispersers are needed)
     # Select female dispersers who will establish using the density dependent probability of establishment
-    WhoFemaleEstablished <- rbinom(n = length(IDFemaleWhoEst), size = 1, prob = NumPossPacks / CarryingCapacity) 
+    WhoFemaleEstablished <- rbinom(n = length(IDFemaleWhoEst), size = 1, prob = NumPossPacks / equilibriumDens) 
     IDMatDispFemWhoEstablished <- IDFemaleWhoEst[WhoFemaleEstablished == 1] # select the ID of the female dispersers who will establish
-    # If there are too many females, remove the ones who cannot establish because we reach the carrying capacity
+    # If there are too many females, remove the ones who cannot establish because we reach equilibrium density
     if(length(IDMatDispFemWhoEstablished) > NumPossPacks){ 
       IDMatDispFemWhoEstablished <- sample.vec(IDMatDispFemWhoEstablished, NumPossPacks, replace = FALSE)
     }
@@ -729,10 +729,10 @@ establishPairing <- function(wolves, allPackID, allWolvesRelatedness){
   }
   
   if(runTests){
-    # There should not be more packs than the pack carrying capacity
+    # There should not be more packs than the equilibrium density
     newWolvesPackID <- unique(of(agents = wolves, var = "packID"))
     newWolvesPackID <- newWolvesPackID[!is.na(newWolvesPackID)] # remove the NA from the dispersers
-    expect_true(length(newWolvesPackID) <= CarryingCapacity)
+    expect_true(length(newWolvesPackID) <= equilibriumDens)
     # packID are always increasing unless there were no pack anymore
     if(length(wolvesPackIDStart) != 0){
       expect_equal(min(newWolvesPackID), min(wolvesPackIDStart))
@@ -760,20 +760,20 @@ establishBudding <- function(wolves, allPackID, allWolvesRelatedness){
   wolvesPackIDStart <- wolvesPackID
   totalEsta <- 0
   
-  # If the environment is not at carrying capacity, some new packs can be created
-  if(CarryingCapacity > length(wolvesPackID)){
+  # If the environment is not at equilibrium density, some new packs can be created
+  if(equilibriumDens > length(wolvesPackID)){
     
     Disperser <- NLwith(agents = wolves, var = "disp", val = 1)
     MatureDisp <- NLwith(agents = Disperser, var = "age", val = c(2:15))
     IDMatureDisp <- of(agents = MatureDisp, var = "who")
     
     # Number of possible new packs
-    NumPossPacks <- CarryingCapacity - length(wolvesPackID)
+    NumPossPacks <- equilibriumDens - length(wolvesPackID)
     
     # Select dispersers who will establish using the density dependent probability of establishment reduced by the probability of finding a partner to budd with (probBudd)
-    WhoEstablished <- rbinom(n = length(IDMatureDisp), size = 1, prob = NumPossPacks / CarryingCapacity) & rbinom(n = length(IDMatureDisp), size = 1, prob = probBudd)
+    WhoEstablished <- rbinom(n = length(IDMatureDisp), size = 1, prob = NumPossPacks / equilibriumDens) & rbinom(n = length(IDMatureDisp), size = 1, prob = probBudd)
     IDMatDispWhoEstablished <- IDMatureDisp[WhoEstablished == 1] # select the ID of dispersers who will establish
-    # If there are too many dispersers, remove the ones who cannot establish because we reach the carrying capacity
+    # If there are too many dispersers, remove the ones who cannot establish because we reach equilibrium density
     if(length(IDMatDispWhoEstablished) > NumPossPacks){
       IDMatDispWhoEstablished <- sample.vec(IDMatDispWhoEstablished, NumPossPacks, replace = FALSE)
     }
@@ -856,10 +856,10 @@ establishBudding <- function(wolves, allPackID, allWolvesRelatedness){
   }
   
   if(runTests){
-    # There should not be more packs than the pack carrying capacity
+    # There should not be more packs than the equilibrium density
     newWolvesPackID <- unique(of(agents = wolves, var = "packID"))
     newWolvesPackID <- newWolvesPackID[!is.na(newWolvesPackID)] # remove the NA from the dispersers
-    expect_true(length(newWolvesPackID) <= CarryingCapacity)
+    expect_true(length(newWolvesPackID) <= equilibriumDens)
     # packID are always increasing unless there were no pack anymore
     if(length(wolvesPackIDStart) != 0){
       expect_equal(min(newWolvesPackID),min(wolvesPackIDStart))
@@ -887,8 +887,8 @@ establishAlone <- function(wolves, allPackID){
   wolvesPackIDStart <- wolvesPackID
   totalEsta <- 0
   
-  # If the environment is not at carrying capacity, some new packs can be created
-  if(CarryingCapacity > length(wolvesPackID)){
+  # If the environment is not at equilibrium density, some new packs can be created
+  if(equilibriumDens > length(wolvesPackID)){
     
     # Dispersers than can establish alone
     Disperser <- NLwith(agents = wolves, var = "disp", val = 1)
@@ -896,12 +896,12 @@ establishAlone <- function(wolves, allPackID){
     IDMatureDisp <- of(agents = MatureDisp, var = "who")
     
     # Number of possible new packs that can be created
-    NumPossPacks <- CarryingCapacity - length(wolvesPackID)
+    NumPossPacks <- equilibriumDens - length(wolvesPackID)
     
     # Select dispersers who will establish using the density dependent probability of establishment
-    WhoEstablished <- rbinom(n = length(IDMatureDisp), size = 1, prob = NumPossPacks / CarryingCapacity) 
+    WhoEstablished <- rbinom(n = length(IDMatureDisp), size = 1, prob = NumPossPacks / equilibriumDens) 
     IDMatDispWhoEstablished <- IDMatureDisp[WhoEstablished == 1] # select the ID of dispersers who will establish
-    # If there are too many dispersers, remove the ones who cannot establish because we reach the carrying capacity
+    # If there are too many dispersers, remove the ones who cannot establish because we reach equilibrium density
     if(length(IDMatDispWhoEstablished) > NumPossPacks){
       IDMatDispWhoEstablished <- sample.vec(IDMatDispWhoEstablished, NumPossPacks, replace = FALSE)
     }
@@ -922,10 +922,10 @@ establishAlone <- function(wolves, allPackID){
   }
   
   if(runTests){
-    # There should not be more packs than the pack carrying capacity
+    # There should not be more packs than the equilibrium density
     newWolvesPackID <- unique(of(agents = wolves, var = "packID"))
     newWolvesPackID <- newWolvesPackID[!is.na(newWolvesPackID)] # remove the NA from the dispersers
-    expect_true(length(newWolvesPackID) <= CarryingCapacity)
+    expect_true(length(newWolvesPackID) <= equilibriumDens)
     # packID are always increasing unless there were no pack anymore
     if(length(wolvesPackIDStart) != 0){
       expect_equal(min(newWolvesPackID),min(wolvesPackIDStart))

@@ -68,7 +68,7 @@ mortalityYearling <- 0.18 # mean mortality for non dispersing yearling
 mortalityYearlingSD <- 0.04 # sd mortality for non dispersing yearling
 mortalityAdult <- 0.18 # mean (non density-dependent) mortality for non dispersing adult
 mortalityAdultSD <- 0.04 # sd  (non density-dependent) mortality for non dispersing adult
-CarryingCapacity <- 30 # pack carrying capacity
+equilibriumDens <- 30 # pack equilibrium density
 terrSize <- 104 # territory size
 mortalityDispPup <- 1 # mean mortality for dispersing pups
 mortalityDispPupSD <- 0 # sd mortality for dispersing pups
