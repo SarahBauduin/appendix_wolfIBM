@@ -18,6 +18,9 @@
 
 # Call the sub-models
 source("submodels.R") # the functions in this file do not need to be modified
+# The package pedantics is supposed to be installed and loaded now
+# If it did not work, please verify the path to the package folder (/appendix_wolfIBM/R/pedantics_1.7.tar.gz) in the file submodels.R
+
 # Call the function to init the population and the sub-model parameter values
 source("initParam.R") # the data about the initial population and the sub-model parameters may be changed to be adapted to the user's question
 

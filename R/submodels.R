@@ -12,6 +12,8 @@
 # Packages used to build the sub-models
 library(NetLogoR)
 library(testthat)
+# pedantics is not available on CRAN anymore, need to use the archive folder to install it
+if (!require("pedantics")) install.packages("pedantics_1.7.tar.gz", repos = NULL, type = "source") # if not already installed
 library(pedantics)
 library(SciViews)
 #######################################
