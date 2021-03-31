@@ -12,9 +12,7 @@
 # Packages used to build the sub-models
 library(NetLogoR)
 library(testthat)
-# pedantics is not available on CRAN anymore, need to use the archive folder to install it
-if (!require("pedantics")) install.packages("pedantics_1.7.tar.gz", repos = NULL, type = "source") # if not already installed
-library(pedantics)
+library(kinship2)
 library(SciViews)
 #######################################
 
@@ -30,7 +28,8 @@ relatedness <- function(listAllInd, whoInd){ # allInd = list of agentMatrix, who
   if(length(listAllInd) == 1){
     allData <- listAllInd[[1]] # combine all the outputs
   } else {
-    allData <- do.call("rbind", listAllInd) # combine all the outputs
+    allData <- do.call("turtleSet", listAllInd) # combine all the outputs
+    # There is a warning because individuals are in multiple items of the listAllInd, so when using turtleSet to combine them together, many individuals are duplicated
   }
   if(sum(!is.na(allData@.Data[,"fatherID"])) == 0 & sum(!is.na(allData@.Data[,"fatherID"])) == 0){ # no info for all individuals on their mother and father
     matrixNA <- matrix(nrow = length(whoInd), ncol = length(whoInd), data = 0) # give 0 of relatedness (no related) if no info
@@ -38,17 +37,11 @@ relatedness <- function(listAllInd, whoInd){ # allInd = list of agentMatrix, who
     rownames(matrixNA) <- whoInd
     return(matrixNA)
   } else {
-    allDataPed <- as.data.frame(cbind(allData@.Data[,"who"], allData@.Data[,"motherID"], allData@.Data[,"fatherID"], allData@.Data[,"cohort"]))
-    names(allDataPed) <- c("id", "dam", "sire", "cohort") # dam = mother/female, sire = father/male, names necessary for pedantics
-    allDataPedUnique <- unique(allDataPed) # remove duplicates = individuals alive more than a year (combination of ID, motherID, fatherID and cohort more than once)
-    if(length(unique(allDataPedUnique[, "cohort"][!is.na(allDataPedUnique[, "cohort"])])) == 1){ # if there is only one cohort
-      wolvesPedigreeSummary <- pedigreeStats(allDataPedUnique[, 1:3], graphicalReport = "n") # do not include it
-    } else {
-      wolvesPedigreeSummary <- pedigreeStats(allDataPedUnique[, 1:3], cohorts = allDataPedUnique[, "cohort"], graphicalReport = "n")
-    }
-    relatednessMatrix <- wolvesPedigreeSummary$Amatrix # matrix of relatedness coefficient between all pairs of individuals
-    return(relatednessMatrix[as.numeric(rownames(wolvesPedigreeSummary$Amatrix)) %in% whoInd, 
-                             as.numeric(colnames(wolvesPedigreeSummary$Amatrix)) %in% whoInd])
+    kinAllInd <- kinship(id = allData@.Data[,"who"], dadid = allData@.Data[,"fatherID"], momid = allData@.Data[,"motherID"], sex = allData@.Data[,"sex"])
+    kinSelectedInd <- kinAllInd[as.numeric(rownames(kinAllInd)) %in% whoInd, as.numeric(colnames(kinAllInd)) %in% whoInd] * 2
+    # kinSelectedInd is multiplied by 2 to be consistant with the values found with pedantics (package used to calculate relatedness in an older version of the model), but could be removed as the relatedness is used as relative values in the model
+    
+    return(kinSelectedInd)
   }
 }
 
