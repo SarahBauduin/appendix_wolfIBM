@@ -196,8 +196,10 @@ mortality <- function(wolves){
     expect_true(NLcount(NLwith(agents = wolvesPup, var = "disp", val = 1)) == 0)
   }
   IDPup <- of(agents = wolvesPup, var = "who")
+  probDeathPup <- rnorm(1, mean = mortalityPup, sd = mortalityPupSD)
+  if(probDeathPup < 0){probDeathPup <- mortalityPup} # to avoid negative probability
   deadPup <- rbinom(n = length(IDPup), size = 1,
-                    prob = rnorm(1, mean = mortalityPup, sd = mortalityPupSD)) # 0 = survive, 1 = die
+                    prob = probDeathPup) # 0 = survive, 1 = die
   wolves <- die(turtles = wolves, who = IDPup[deadPup == 1])
   
   # Yearling mortality
@@ -205,15 +207,19 @@ mortality <- function(wolves){
   wolvesYearling <- NLwith(agents = wolves, var = "age", val = 2)
   nonDispYearling <- NLwith(agents = wolvesYearling, var = "disp", val = 0)
   IDnonDispYearling <- of(agents = nonDispYearling, var = "who")
+  probDeathYearling <- rnorm(1, mean = mortalityYearling, sd = mortalityYearlingSD)
+  if(probDeathYearling < 0){probDeathYearling <- mortalityYearling} # to avoid negative probability
   deadYearling <- rbinom(n = length(IDnonDispYearling), size = 1,
-                         prob = rnorm(1, mean = mortalityYearling, sd = mortalityYearlingSD)) # 0 = survive, 1 = die
+                         prob = probDeathYearling) # 0 = survive, 1 = die
   wolves <- die(turtles = wolves, who = IDnonDispYearling[deadYearling == 1])
   # Yearlings that dispersed as pups and did not become adoptee (i.e., still dispersers) 
   Disperser <- NLwith(agents = wolves, var = "disp", val = 1)
   DisperserYearling <- NLwith(agents = Disperser, var = "age", val = 2)
   IDDisperserYearling <- of(agents = DisperserYearling, var = "who")
+  probDeathDispYearling <- rnorm(1, mean = mortalityDispPup, sd = mortalityDispPupSD)
+  if(probDeathDispYearling < 0){probDeathDispYearling <- mortalityDispPup} # to avoid negative probability
   deadDisperserYearling <- rbinom(n = length(IDDisperserYearling), size = 1,
-                                  prob = rnorm(1, mean = mortalityDispPup, sd = mortalityDispPupSD)) # 0 = survive, 1 = die
+                                  prob = probDeathDispYearling) # 0 = survive, 1 = die
   wolves <- die(turtles = wolves, who = IDDisperserYearling[deadDisperserYearling == 1])
   
   # Adult mortality
@@ -222,18 +228,26 @@ mortality <- function(wolves){
   nonDispAdult <- NLwith(agents = wolvesAdult, var = "disp", val = 0)
   IDnonDispAdult <- of(agents = nonDispAdult, var = "who")
   if(length(numPacks) == equilibriumDens){ # at equilibrium density, mortality density dependent
+    probDeathAdult <- rnorm(1, mean = mortalityDD(popDens = popDens), sd = 0)
+    if(runTests){
+      expect_gte(probDeathAdult, 0) # probDeathAdult must be greater or equal 0
+    }
     deadAdult <- rbinom(n = length(IDnonDispAdult), size = 1,
-                        prob = rnorm(1, mean = mortalityDD(popDens = popDens), sd = 0))
+                        prob = probDeathAdult)
   } else { # there are less packs than the maximum allowed for this study area, mortality not density dependent
+    probDeathAdult <- rnorm(1, mean = mortalityAdult, sd = mortalityAdultSD)
+    if(probDeathAdult < 0){probDeathAdult <- mortalityAdult} # to avoid negative probability
     deadAdult <- rbinom(n = length(IDnonDispAdult), size = 1,
-                        prob = rnorm(1, mean = mortalityAdult, sd = mortalityAdultSD))
+                        prob = probDeathAdult)
   }
   wolves <- die(turtles = wolves, who = IDnonDispAdult[deadAdult == 1])
-  # Dispersersing adults
+  # Dispersing adults
   DisperserAdult <- NLwith(agents = Disperser, var = "age", val = 3:15)
   IDDisperserAdult <- of(agents = DisperserAdult, var = "who")
+  probDeathDispAdult <- rnorm(1, mean = mortalityDisp, sd = mortalityDispSD)
+  if(probDeathDispAdult < 0){probDeathDispAdult <- mortalityDisp} # to avoid negative probability
   deadDisperserAdult <- rbinom(n = length(IDDisperserAdult), size = 1,
-                               prob = rnorm(1, mean = mortalityDisp, sd = mortalityDispSD)) # 0 = survive, 1 = die
+                               prob = probDeathDispAdult) # 0 = survive, 1 = die
   wolves <- die(turtles = wolves, who = IDDisperserAdult[deadDisperserAdult == 1])
   
   if(runTests){
